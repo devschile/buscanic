@@ -98,7 +98,14 @@ export default function Home() {
           <input
             type="text"
             value={domain}
-            onChange={(e) => setDomain(e.target.value)}
+            onChange={(e) => {
+              const sanitized = e.target.value
+                .replace(/\s/g, "")
+                .replace(/[^a-zA-Z0-9.,\-]/g, "");
+              const parts = sanitized.split(',');
+              const capped = parts.map(p => p.slice(0, 12));
+              setDomain(capped.join(','));
+            }}
             placeholder="devschile.cl"
             className={styles.input}
           />
