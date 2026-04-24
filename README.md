@@ -1,6 +1,6 @@
-# BuscaNic
+# .BuscaNic {}
 
-Chuta, consulta la disponibilidad de dominios `.CL` en tiempo real usando el protocolo WHOIS de NIC Chile. Ya po, funciona bien.
+Chuata, búscate la disponibilidad de dominios `.CL` en tiempo real usando el protocolo WHOIS de NIC Chile. Tal cual, piola.
 
 ## Uso
 
@@ -8,7 +8,7 @@ Chuta, consulta la disponibilidad de dominios `.CL` en tiempo real usando el pro
 npm run dev
 ```
 
-Abre [http://localhost:3000](http://localhost:3000) en tu navegador y Busca tu wea de dominio.
+Abre [http://localhost:3000](http://localhost:3000) en tu navegador y mete tu wea de dominio. Pueden ser varios si te ponís creativo.
 
 ## API
 
@@ -18,7 +18,8 @@ curl -X POST http://localhost:3000/api/check \
   -d '{"domain": "midominio"}'
 ```
 
-Te responde algo así:
+Te responde una weá así:
+
 ```json
 {
   "domain": "midominio.cl",
@@ -27,7 +28,7 @@ Te responde algo así:
 }
 ```
 
-Si está `available` está frei, si está `registered` ya está ocupado, y si es `unknown` alguma se pudrió.
+Si está `available` tay listoco, si está `registered` te fuiste, y si es `unknown` algo se pudrió.
 
 ## Tech Stack
 
@@ -35,4 +36,6 @@ Si está `available` está frei, si está `registered` ya está ocupado, y si es
 - TypeScript
 - IBM Plex Mono
 
-Hecho con wea malta y cafe.
+Hecho con weas como malta con huevo y café.
+
+Por los tremendos lokos de [devsChile](https://www.devschile.cl). Permiso: [MIT](LICENSE).

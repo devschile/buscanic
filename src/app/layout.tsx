@@ -9,6 +9,7 @@ const ibmPlex = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://buscanic.devschile.cl"),
   title: ".BuscaNic {}",
   description: "Consulta la disponibilidad de dominios .CL en tiempo real",
   icons: {
