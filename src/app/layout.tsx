@@ -9,13 +9,13 @@ const ibmPlex = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "BuscaNic",
+  title: ".BuscaNic {}",
   description: "Consulta la disponibilidad de dominios .CL en tiempo real",
   icons: {
     icon: "/favicon.png",
   },
   openGraph: {
-    title: "BuscaNic",
+    title: ".BuscaNic {}",
     description: "Consulta la disponibilidad de dominios .CL en tiempo real",
     type: "website",
     locale: "es_CL",
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "BuscaNic",
+    title: ".BuscaNic {}",
     description: "Consulta la disponibilidad de dominios .CL en tiempo real",
   },
 };

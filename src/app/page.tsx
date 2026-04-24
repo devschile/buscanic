@@ -77,6 +77,7 @@ export default function Home() {
         setError(data.results ? 'Error checking domains' : (data as any).error || "Error checking domains");
       } else {
         setResults(data.results);
+        setDomain("");
       }
     } catch {
       setError("Error checking domains");
@@ -86,62 +87,65 @@ export default function Home() {
   };
 
   return (
-    <div className={styles.container}>
-      <h1 className={styles.title}>BuscaNic</h1>
-      <p className={styles.description}>
-        Consulta la disponibilidad de dominios .CL en tiempo real
-      </p>
+    <div>
+      <div className={styles.container}>
+        <h1 className={styles.title}>.BuscaNic &#123;&#125;</h1>
+        <p className={styles.description}>
+          Consulta la disponibilidad de dominios .CL en tiempo real
+        </p>
 
-      <form onSubmit={handleSearch} className={styles.form}>
-        <input
-          type="text"
-          value={domain}
-          onChange={(e) => setDomain(e.target.value)}
-          placeholder="devschile.cl"
-          className={styles.input}
-        />
-        <button type="submit" disabled={loading} className={styles.button}>
-          {loading ? "buscando..." : "buscar"}
-        </button>
-      </form>
-      <p className={styles.hint}>para buscar múltiples dominios, sepáralos por coma (beerjs, generacv.cl)</p>
+        <form onSubmit={handleSearch} className={styles.form}>
+          <input
+            type="text"
+            value={domain}
+            onChange={(e) => setDomain(e.target.value)}
+            placeholder="devschile.cl"
+            className={styles.input}
+          />
+          <button type="submit" disabled={loading || !domain.trim()} className={styles.button}>
+            {loading ? "buscando..." : "_buscar"}
+          </button>
+        </form>
+        <p className={styles.hint}>Para buscar múltiples dominios, sepáralos por coma (beerjs, huemul, generacv.cl)</p>
 
-      {error && <p className={styles.error}>{error}</p>}
+        {error && <p className={styles.error}>{error}</p>}
 
-      {results && (
-        <div className={styles.resultsList}>
-          {results.map((r, i) => (
-            <div key={i} className={styles.result}>
-              <div className={styles.resultRow}>
-                <span className={styles.domain}>{r.domain}</span>
-                <a
-                  href={`https://www.nic.cl/registry/Whois.do?d=${r.domain}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={`${styles.status} ${
-                    r.status === "available"
-                      ? styles.available
-                      : r.status === "registered"
-                      ? styles.registered
-                      : styles.unknown
-                  }`}
-                >
-                  {r.status === "available" && "disponible"}
-                  {r.status === "registered" && "registrado"}
-                  {r.status === "unknown" && "desconocido"}
-                </a>
+        {results && (
+          <div className={styles.resultsList}>
+            {results.map((r, i) => (
+              <div key={i} className={styles.result}>
+                <div className={styles.resultRow}>
+                  <span className={styles.domain}>{r.domain}</span>
+                  <a
+                    href={`https://www.nic.cl/registry/Whois.do?d=${r.domain}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`${styles.status} ${
+                      r.status === "available"
+                        ? styles.available
+                        : r.status === "registered"
+                        ? styles.registered
+                        : styles.unknown
+                    }`}
+                  >
+                    {r.status === "available" && "_disponible"}
+                    {r.status === "registered" && "_registrado"}
+                    {r.status === "unknown" && "_desconocido"}
+                  </a>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
-      )}
-
+            ))}
+          </div>
+        )}
+      </div>
       <footer className={styles.footer}>
         <p>
-          © {new Date().getFullYear()} BuscaNic por{" "}
+          &copy; {new Date().getFullYear()} .BuscaNic &#123;&#125; por{" "} 
           <a href="https://www.devschile.cl/" target="_blank" rel="noopener noreferrer">
             devsChile
           </a>
+          .{" "}
+          No tenemos relación con <a href="https://www.nic.cl/" target="_blank" rel="noopener noreferrer">Nic Chile</a>, si nos banean hasta ahí llegó este proyecto.
         </p>
       </footer>
     </div>
