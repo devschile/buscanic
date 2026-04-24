@@ -3,7 +3,23 @@
 import { useEffect, useRef } from "react";
 
 type CanvasElement = {
+  x: number;
+  y: number;
+  dx: number;
+  dy: number;
   draw: (ctx: CanvasRenderingContext2D, t: number) => void;
+};
+
+type CircleElement = CanvasElement & {
+  r: number;
+  w: number;
+};
+
+type CrossElement = CanvasElement & {
+  s: number;
+  w: number;
+  r: number;
+  dr: number;
 };
 
 export default function AnimatedCanvasBackground() {
@@ -29,7 +45,7 @@ export default function AnimatedCanvasBackground() {
     resize();
 
     const presets = {
-      o: (x: number, y: number, s: number, dx: number, dy: number): CanvasElement => ({
+      o: (x: number, y: number, s: number, dx: number, dy: number): CircleElement => ({
         x,
         y,
         r: 12 * s,
@@ -62,7 +78,7 @@ export default function AnimatedCanvasBackground() {
         dy: number,
         dr: number,
         r = 0,
-      ): CanvasElement => ({
+      ): CrossElement => ({
         x,
         y,
         s: 20 * s,
