@@ -52,9 +52,9 @@ export default function Home() {
     if (!validated) {
       const parts = domain.trim().split(',').filter(d => d.trim());
       if (parts.length > 5) {
-        setError('Máximo 5 dominios por búsqueda');
+        setError('Tranquilein, hasta 5 dominios por búsqueda');
       } else {
-        setError('Solo se aceptan dominios .CL');
+        setError('Cammao, solo .CL machucao.');
       }
       setResults(null);
       return;
@@ -91,7 +91,7 @@ export default function Home() {
       <div className={styles.container}>
         <h1 className={styles.title}>.BuscaNic &#123;&#125;</h1>
         <p className={styles.description}>
-          Consulta la disponibilidad de dominios .CL en tiempo real
+          Lorea la disponibilidad de dominios .CL en tiempo real. La firme.
         </p>
 
         <form onSubmit={handleSearch} className={styles.form}>
@@ -110,10 +110,10 @@ export default function Home() {
             className={styles.input}
           />
           <button type="submit" disabled={loading || !domain.trim()} className={styles.button}>
-            {loading ? "buscando..." : "_buscar"}
+            {loading ? "buscando..." : "_aver"}
           </button>
         </form>
-        <p className={styles.hint}>Para buscar múltiples dominios, sepáralos por coma (beerjs, huemul, generacv.cl)</p>
+        <p className={styles.hint}>¿Ansioso? Busca hartos, sepáralos por coma (beerjs, huemul, generacv.cl)</p>
 
         {error && <p className={styles.error}>{error}</p>}
 
@@ -135,9 +135,9 @@ export default function Home() {
                         : styles.unknown
                     }`}
                   >
-                    {r.status === "available" && "_disponible"}
-                    {r.status === "registered" && "_registrado"}
-                    {r.status === "unknown" && "_desconocido"}
+                    {r.status === "available" && "_taweno"}
+                    {r.status === "registered" && "_tatomao"}
+                    {r.status === "unknown" && "_quesesto"}
                   </a>
                 </div>
               </div>
@@ -152,7 +152,7 @@ export default function Home() {
             devsChile
           </a>
           .{" "}
-          No tenemos relación con <a href="https://www.nic.cl/" target="_blank" rel="noopener noreferrer">Nic Chile</a>, si nos banean hasta ahí llegó este proyecto.
+          No tenemos relación con <a href="https://www.nic.cl/" target="_blank" rel="noopener noreferrer">Nic Chile</a>. Si nos banean hasta ahí llegó esta weá.
         </p>
       </footer>
     </div>

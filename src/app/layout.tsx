@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
+import AnimatedCanvasBackground from "./components/AnimatedCanvasBackground";
 
 const ibmPlex = IBM_Plex_Mono({
   weight: ["400", "500"],
@@ -11,13 +12,13 @@ const ibmPlex = IBM_Plex_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://buscanic.devschile.cl"),
   title: ".BuscaNic {}",
-  description: "Consulta la disponibilidad de dominios .CL en tiempo real",
+  description: "Lorea la disponibilidad de dominios .CL en tiempo real. La firme.",
   icons: {
     icon: "/favicon.png",
   },
   openGraph: {
     title: ".BuscaNic {}",
-    description: "Consulta la disponibilidad de dominios .CL en tiempo real",
+    description: "Lorea la disponibilidad de dominios .CL en tiempo real. La firme.",
     type: "website",
     locale: "es_CL",
     siteName: "BuscaNic",
@@ -33,7 +34,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: ".BuscaNic {}",
-    description: "Consulta la disponibilidad de dominios .CL en tiempo real",
+    description: "Lorea la disponibilidad de dominios .CL en tiempo real. La firme.",
   },
 };
 
@@ -44,7 +45,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es">
-      <body className={ibmPlex.variable}>{children}</body>
+      <body className={ibmPlex.variable}>
+        <AnimatedCanvasBackground />
+        <div className="app-content">{children}</div>
+      </body>
     </html>
   );
 }
