@@ -9,8 +9,31 @@ const ibmPlex = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "BUSCA NIC",
+  title: "BuscaNic",
   description: "Consulta la disponibilidad de dominios .CL en tiempo real",
+  icons: {
+    icon: "/favicon.png",
+  },
+  openGraph: {
+    title: "BuscaNic",
+    description: "Consulta la disponibilidad de dominios .CL en tiempo real",
+    type: "website",
+    locale: "es_CL",
+    siteName: "BuscaNic",
+    images: [
+      {
+        url: "/social.jpg",
+        width: 1200,
+        height: 630,
+        alt: "BuscaNic",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "BuscaNic",
+    description: "Consulta la disponibilidad de dominios .CL en tiempo real",
+  },
 };
 
 export default function RootLayout({

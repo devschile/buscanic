@@ -36,32 +36,49 @@ async function checkWhois(domain: string): Promise<'available' | 'registered' | 
 }
 
 export async function POST(request: NextRequest) {
-  const { domain } = await request.json()
+  const { domain, domains } = await request.json()
 
-  if (!domain) {
+  let domainList: string[] = []
+
+  if (domains && Array.isArray(domains)) {
+    domainList = domains
+  } else if (domain) {
+    domainList = domain.split(',').map((d: string) => d.trim())
+  }
+
+  if (domainList.length === 0) {
     return NextResponse.json({ error: 'Domain is required' }, { status: 400 })
   }
 
-  const cleanDomain = domain.toLowerCase().replace(/\.cl$/i, '').trim()
-
-  if (!cleanDomain || cleanDomain.length < 2) {
-    return NextResponse.json({ error: 'Invalid domain' }, { status: 400 })
+  if (domainList.length > 5) {
+    return NextResponse.json({ error: 'Maximum 5 domains per search' }, { status: 400 })
   }
 
-  const fullDomain = cleanDomain.endsWith('.cl') ? cleanDomain : `${cleanDomain}.cl`
+  const results = await Promise.all(
+    domainList.map(async (d: string) => {
+      const cleanDomain = d.toLowerCase().trim()
+      const hasTld = cleanDomain.includes('.')
+      const tld = hasTld ? cleanDomain.split('.').pop() : null
+      
+      if (tld && tld !== 'cl') {
+        return { domain: d, status: 'unknown' as const, invalid: true, error: 'Solo se aceptan dominios .CL' }
+      }
+      
+      const domainWithoutTld = cleanDomain.replace(/\.cl$/i, '')
+      
+      if (!domainWithoutTld || domainWithoutTld.length < 2) {
+        return { domain: d, status: 'unknown' as const, invalid: true }
+      }
 
-  try {
-    const status = await checkWhois(fullDomain)
+      const fullDomain = domainWithoutTld.endsWith('.cl') ? domainWithoutTld : `${domainWithoutTld}.cl`
+      const status = await checkWhois(fullDomain)
 
-    return NextResponse.json({
-      domain: fullDomain,
-      status,
-      checkedAt: new Date().toISOString(),
+      return { domain: fullDomain, status, invalid: false }
     })
-  } catch (error) {
-    return NextResponse.json(
-      { error: 'Failed to check domain availability' },
-      { status: 500 }
-    )
-  }
+  )
+
+  return NextResponse.json({
+    results,
+    checkedAt: new Date().toISOString(),
+  })
 }

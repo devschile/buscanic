@@ -1,37 +1,68 @@
 "use client";
 
+export const dynamic = 'force-dynamic';
+
 import { useState } from "react";
 import styles from "./page.module.css";
 
-interface CheckResult {
+interface DomainResult {
   domain: string;
   status: "available" | "registered" | "unknown";
+  invalid?: boolean;
+}
+
+interface CheckResponse {
+  results: DomainResult[];
   checkedAt: string;
 }
 
 export default function Home() {
   const [domain, setDomain] = useState("");
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<CheckResult | null>(null);
+  const [results, setResults] = useState<DomainResult[] | null>(null);
   const [error, setError] = useState("");
+
+  const validateDomains = (input: string): string[] | null => {
+    const parts = input.split(',').map(d => d.trim().toLowerCase());
+    
+    if (parts.length > 5) {
+      return null;
+    }
+    
+    for (const part of parts) {
+      if (!part) continue;
+      
+      const hasTld = part.includes('.');
+      const tld = hasTld ? part.split('.').pop() : null;
+      
+      if (tld && tld !== 'cl') {
+        return null;
+      }
+    }
+    
+    return parts.filter(d => d.length > 0);
+  };
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!domain.trim()) return;
 
-    const input = domain.trim().toLowerCase();
-    const hasTld = input.includes('.');
-    const tld = hasTld ? input.split('.').pop() : null;
+    const validated = validateDomains(domain.trim());
 
-    if (tld && tld !== 'cl') {
-      setError('Solo se aceptan dominios .CL');
-      setResult(null);
+    if (!validated) {
+      const parts = domain.trim().split(',').filter(d => d.trim());
+      if (parts.length > 5) {
+        setError('Máximo 5 dominios por búsqueda');
+      } else {
+        setError('Solo se aceptan dominios .CL');
+      }
+      setResults(null);
       return;
     }
 
     setLoading(true);
     setError("");
-    setResult(null);
+    setResults(null);
 
     try {
       const res = await fetch("/api/check", {
@@ -40,15 +71,15 @@ export default function Home() {
         body: JSON.stringify({ domain: domain.trim() }),
       });
 
-      const data = await res.json();
+      const data: CheckResponse = await res.json();
 
       if (!res.ok) {
-        setError(data.error || "Error checking domain");
+        setError(data.results ? 'Error checking domains' : (data as any).error || "Error checking domains");
       } else {
-        setResult(data);
+        setResults(data.results);
       }
     } catch {
-      setError("Error checking domain");
+      setError("Error checking domains");
     } finally {
       setLoading(false);
     }
@@ -66,39 +97,53 @@ export default function Home() {
           type="text"
           value={domain}
           onChange={(e) => setDomain(e.target.value)}
-          placeholder="midominio"
+          placeholder="devschile.cl"
           className={styles.input}
         />
         <button type="submit" disabled={loading} className={styles.button}>
-            {loading ? "buscando..." : "buscar"}
-          </button>
+          {loading ? "buscando..." : "buscar"}
+        </button>
       </form>
+      <p className={styles.hint}>para buscar múltiples dominios, sepáralos por coma (beerjs, generacv.cl)</p>
 
       {error && <p className={styles.error}>{error}</p>}
 
-      {result && (
-        <div className={styles.result}>
-          <div className={styles.resultRow}>
-            <span className={styles.domain}>{result.domain}</span>
-            <a
-              href={`https://www.nic.cl/registry/Whois.do?d=${result.domain}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={`${styles.status} ${
-                result.status === "available"
-                  ? styles.available
-                  : result.status === "registered"
-                  ? styles.registered
-                  : styles.unknown
-              }`}
-            >
-              {result.status === "available" && "disponible"}
-              {result.status === "registered" && "registrado"}
-              {result.status === "unknown" && "desconocido"}
-            </a>
-          </div>
+      {results && (
+        <div className={styles.resultsList}>
+          {results.map((r, i) => (
+            <div key={i} className={styles.result}>
+              <div className={styles.resultRow}>
+                <span className={styles.domain}>{r.domain}</span>
+                <a
+                  href={`https://www.nic.cl/registry/Whois.do?d=${r.domain}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`${styles.status} ${
+                    r.status === "available"
+                      ? styles.available
+                      : r.status === "registered"
+                      ? styles.registered
+                      : styles.unknown
+                  }`}
+                >
+                  {r.status === "available" && "disponible"}
+                  {r.status === "registered" && "registrado"}
+                  {r.status === "unknown" && "desconocido"}
+                </a>
+              </div>
+            </div>
+          ))}
         </div>
       )}
+
+      <footer className={styles.footer}>
+        <p>
+          © {new Date().getFullYear()} BuscaNic por{" "}
+          <a href="https://www.devschile.cl/" target="_blank" rel="noopener noreferrer">
+            devsChile
+          </a>
+        </p>
+      </footer>
     </div>
   );
 }
