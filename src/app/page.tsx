@@ -4,44 +4,7 @@ export const dynamic = 'force-dynamic';
 
 import { useState } from "react";
 import styles from "./page.module.css";
-
-interface DomainResult {
-  domain: string;
-  status: "available" | "registered" | "unknown";
-  invalid?: boolean;
-}
-
-interface CheckResponse {
-  results: DomainResult[];
-  checkedAt: string;
-}
-
-export default function Home() {
-  const [domain, setDomain] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [results, setResults] = useState<DomainResult[] | null>(null);
-  const [error, setError] = useState("");
-
-  const validateDomains = (input: string): string[] | null => {
-    const parts = input.split(',').map(d => d.trim().toLowerCase());
-    
-    if (parts.length > 5) {
-      return null;
-    }
-    
-    for (const part of parts) {
-      if (!part) continue;
-      
-      const hasTld = part.includes('.');
-      const tld = hasTld ? part.split('.').pop() : null;
-      
-      if (tld && tld !== 'cl') {
-        return null;
-      }
-    }
-    
-    return parts.filter(d => d.length > 0);
-  };
+import { validateDomains } from "@/lib/validation";
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,10 +12,12 @@ export default function Home() {
 
     const validated = validateDomains(domain.trim());
 
-    if (!validated) {
+    if (!validated || validated.length === 0) {
       const parts = domain.trim().split(',').filter(d => d.trim());
       if (parts.length > 5) {
         setError('Tranquilein, hasta 5 dominios por búsqueda');
+      } else if (parts.length === 0) {
+        setError('Ingresa al menos un dominio válido');
       } else {
         setError('Cammao, solo .CL machucao.');
       }
@@ -68,16 +33,20 @@ export default function Home() {
       const res = await fetch("/api/check", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ domain: domain.trim() }),
+        body: JSON.stringify({ domain: validated.join(",") }),
       });
 
-      const data: CheckResponse = await res.json();
+      const data: CheckResponse | ErrorResponse = await res.json();
 
       if (!res.ok) {
-        setError(data.results ? 'Error checking domains' : (data as any).error || "Error checking domains");
+        setError("error" in data ? data.error || "Error checking domains" : "Error checking domains");
       } else {
-        setResults(data.results);
-        setDomain("");
+        if ("results" in data) {
+          setResults(data.results);
+          setDomain("");
+        } else {
+          setError("Error checking domains");
+        }
       }
     } catch {
       setError("Error checking domains");
@@ -85,6 +54,13 @@ export default function Home() {
       setLoading(false);
     }
   };
+
+  const currentValidation = validateDomains(domain.trim());
+  const isSubmitDisabled =
+    loading ||
+    !domain.trim() ||
+    !currentValidation ||
+    currentValidation.length === 0;
 
   return (
     <div>
@@ -101,15 +77,15 @@ export default function Home() {
             onChange={(e) => {
               const sanitized = e.target.value
                 .replace(/\s/g, "")
-                .replace(/[^a-zA-Z0-9.,\-]/g, "");
+                .replace(/[^a-zA-Z0-9.,\-áéíóúñÁÉÍÓÚÑ]/g, "");
               const parts = sanitized.split(',');
-              const capped = parts.map(p => p.slice(0, 12));
+              const capped = parts.map(p => p.slice(0, 16));
               setDomain(capped.join(','));
             }}
             placeholder="devschile.cl"
             className={styles.input}
           />
-          <button type="submit" disabled={loading || !domain.trim()} className={styles.button}>
+          <button type="submit" disabled={isSubmitDisabled} className={styles.button}>
             {loading ? "buscando..." : "_aver"}
           </button>
         </form>
