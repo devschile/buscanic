@@ -1,7 +1,12 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  crons: [
+    {
+      path: '/api/check',
+      schedule: '0 0 * * *',
+    },
+  ],
 };
 
 export default nextConfig;
