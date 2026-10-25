@@ -6,6 +6,27 @@ import { useState } from "react";
 import styles from "./page.module.css";
 import { validateDomains } from "@/lib/validation";
 
+interface DomainResult {
+  domain: string;
+  status: "available" | "registered" | "unknown";
+  invalid?: boolean;
+}
+
+interface CheckResponse {
+  results: DomainResult[];
+  checkedAt: string;
+}
+
+interface ErrorResponse {
+  error?: string;
+}
+
+export default function Home() {
+  const [domain, setDomain] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [results, setResults] = useState<DomainResult[] | null>(null);
+  const [error, setError] = useState("");
+
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!domain.trim()) return;
