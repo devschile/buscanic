@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { validateDomains } from '@/lib/validation'
+import { MAX_DOMAIN_LENGTH, isValidDomainPart, validateDomains } from '@/lib/validation'
 
 describe('🔍 Domain Validation Module', () => {
   describe('📋 Input Limits', () => {
@@ -13,6 +13,67 @@ describe('🔍 Domain Validation Module', () => {
       const input = 'a.cl,b.cl,c.cl,d.cl,e.cl,f.cl'
       const result = validateDomains(input)
       expect(result, `Should reject 6+ domains (limit is 5) → [${input}]`).toBeNull()
+    })
+  })
+
+  describe('📏 Domain Length Limit', () => {
+    it('[LENGTH] ✓ Exposes a 56 character limit', () => {
+      expect(MAX_DOMAIN_LENGTH, 'Limit should be 56 characters').toBe(56)
+    })
+
+    it('[LENGTH] ✓ Accepts a domain longer than the old 16 char limit', () => {
+      const input = 'a'.repeat(17) + '.cl'
+      const result = validateDomains(input)
+      expect(result, `Should accept 20 chars (old limit was 16) → ${input}`).toEqual([input])
+    })
+
+    it('[LENGTH] ✓ Accepts a domain of exactly 56 characters', () => {
+      const input = 'a'.repeat(53) + '.cl'
+      expect(input.length).toBe(56)
+      const result = validateDomains(input)
+      expect(result, `Should accept exactly 56 chars → ${input}`).toEqual([input])
+    })
+
+    it('[LENGTH] ✗ Rejects a domain of 57 characters', () => {
+      const input = 'a'.repeat(54) + '.cl'
+      expect(input.length).toBe(57)
+      const result = validateDomains(input)
+      expect(result, `Should reject 57 chars → ${input}`).toBeNull()
+    })
+
+    it('[LENGTH] ✗ Rejects the whole input when only one domain is too long', () => {
+      const input = 'devschile.cl,' + 'a'.repeat(57)
+      const result = validateDomains(input)
+      expect(result, `Should reject if any domain exceeds 56 chars → [${input}]`).toBeNull()
+    })
+
+    it('[LENGTH] ✓ Applies the limit per domain, not to the whole input', () => {
+      const input = Array.from({ length: 5 }, () => 'a'.repeat(56)).join(',')
+      const result = validateDomains(input)
+      expect(result, 'Should accept 5 domains of 56 chars each').toHaveLength(5)
+    })
+  })
+
+  describe('🛡️ Character Whitelist', () => {
+    it('[SAFE] ✗ Rejects CRLF inside a domain', () => {
+      const input = 'evil\r\nhack.cl'
+      expect(validateDomains(input), 'Should reject CR/LF (whois injection)').toBeNull()
+    })
+
+    it('[SAFE] ✗ Rejects spaces inside a domain', () => {
+      expect(validateDomains('dev schile.cl'), 'Should reject inner spaces').toBeNull()
+    })
+
+    it('[SAFE] ✗ Rejects symbols outside the whitelist', () => {
+      expect(validateDomains('dev_schile.cl'), 'Should reject underscore').toBeNull()
+      expect(validateDomains('dev/schile.cl'), 'Should reject slash').toBeNull()
+      expect(validateDomains('dev;schile.cl'), 'Should reject semicolon').toBeNull()
+    })
+
+    it('[SAFE] ✓ isValidDomainPart mirrors the whitelist and length', () => {
+      expect(isValidDomainPart('café-niño.cl'), 'Tildes, ñ and hyphen are valid').toBe(true)
+      expect(isValidDomainPart(''), 'Empty string is not a valid part').toBe(false)
+      expect(isValidDomainPart('a'.repeat(57)), '57 chars is not valid').toBe(false)
     })
   })
 

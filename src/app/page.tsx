@@ -4,7 +4,7 @@ export const dynamic = 'force-dynamic';
 
 import { useState } from "react";
 import styles from "./page.module.css";
-import { validateDomains } from "@/lib/validation";
+import { MAX_DOMAIN_LENGTH, validateDomains } from "@/lib/validation";
 
 interface DomainResult {
   domain: string;
@@ -100,7 +100,7 @@ export default function Home() {
                 .replace(/\s/g, "")
                 .replace(/[^a-zA-Z0-9.,\-áéíóúñÁÉÍÓÚÑ]/g, "");
               const parts = sanitized.split(',');
-              const capped = parts.map(p => p.slice(0, 16));
+              const capped = parts.map(p => p.slice(0, MAX_DOMAIN_LENGTH));
               setDomain(capped.join(','));
             }}
             placeholder="devschile.cl"
