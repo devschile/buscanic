@@ -14,7 +14,7 @@ export default defineConfig({
       '**/dist/**',
       'src/app/**', // Exclude Next.js app directory
     ],
-    reporter: 'verbose',
+    reporters: ['verbose'],
     outputFile: {
       json: './coverage/test-results.json',
     },
